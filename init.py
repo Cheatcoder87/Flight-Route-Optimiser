@@ -56,8 +56,7 @@ def fetch_flights(from_iata, to_iata):
         res = requests.get(BASE_URL, params=params)
         data = res.json()
         flights_data = data.get("data", [])
-        print(f"🛰️ {from_iata} → {to_iata} | Flights found: {len(flights_data)}")
-
+        
         flights = []
 
         for f in flights_data:
@@ -92,7 +91,6 @@ def fetch_flights(from_iata, to_iata):
         return flights
 
     except Exception as e:
-        print(f"❌ Error fetching {from_iata} → {to_iata}:", e)
         return []
 
 def build_flight_file():
@@ -111,16 +109,11 @@ def build_flight_file():
                 if key in seen:
                     continue
                 seen.add(key)
-
-                print(f"Fetching {from_iata} → {to_iata}...")
                 flights = fetch_flights(from_iata, to_iata)
 
                 for flight in flights:
                     f.write(flight + "\n")
-
                 time.sleep(1.2)
-
-    print("✅ All flights saved to flight.txt")
 
 if __name__ == "__main__":
     build_flight_file()
