@@ -38,7 +38,6 @@ def status():
         try:
             response = requests.get(url, headers=headers)
             data = response.json()
-            # print("DEBUG Response Type:", type(data))
 
             if isinstance(data, list) and len(data) > 0:
                 flight = data[0]
@@ -65,7 +64,6 @@ def status():
             return render_template("status.html", error=f"Error fetching flight status: {str(e)}")
 
     return render_template("status.html")
-
 
 
 
@@ -144,11 +142,7 @@ def list1():
         if result.returncode != 0:
             return f"Error from executable: {result.stderr}"
 
-        # print("Raw output:\n", result.stdout)
-
         flights = parse_list_output(result.stdout)
-        # print("Parsed flights:\n", flights) 
-
         return render_template("list.html", flights=flights,cities=cities)
 
     except subprocess.TimeoutExpired:
