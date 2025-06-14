@@ -23,6 +23,8 @@ A C++ and Python-based flight route optimizer with a Flask web interface that:
 
 ## 📌 Setup
 ```bash
+# Setup
+pip install -r requirements.txt
 # Compile C++ code
 g++ code.cpp -o code
 # to generate the latest flight list
