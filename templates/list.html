@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Flights</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url("{{ url_for('static', filename='flight1.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: rgba(57, 162, 210, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        h2 {
+            text-align: center;
+            font-weight: 600;
+            color: #000000;
+            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .table {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .table th,
+        .table td {
+            background: rgba(255, 255, 255, 0.1); /* light transparent */
+            color: #000;
+            vertical-align: middle;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .table thead th {
+            background-color: rgba(200, 200, 200, 0.3); /* soft header background */
+            color: #1f1f1f;
+            font-weight: bold;
+        }
+
+
+        .btn-danger, .btn-warning {
+            margin: 0 3px;
+        }
+
+        .btn-secondary {
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .toast {
+            opacity: 0.95;
+        }
+
+        .toast-body {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Available Flights</h2>
+
+        {% if error %}
+            <div class="alert alert-warning" role="alert">
+                {{ error }}
+            </div>
+        {% else %}
+        <form class="row g-3 mb-4" id="filterForm">
+            <div class="col-md-3">
+                <label class="form-label text-black">From</label>
+                <select class="form-select" id="filterFrom" name="filterFrom" required>
+                    <option value="">Select city</option>
+                    {% for city in cities %}
+                    <option value="{{city}}">{{city}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-black">To</label>
+                <select class="form-select" id="filterTo" name="filterTo" required>
+                    <option value="">Select city</option>
+                    {% for city in cities %}
+                    <option value="{{city}}">{{city}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-black">Min Price (₹)</label>
+                <input type="number" class="form-control" id="filterMinPrice" placeholder="0">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-black">Max Price (₹)</label>
+                <input type="number" class="form-control" id="filterMaxPrice" placeholder="10000">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-black">Departure After</label>
+                <input type="time" class="form-control" id="filterDepartureStart">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-black">Departure Before</label>
+                <input type="time" class="form-control" id="filterDepartureEnd">
+            </div>
+            <div class="col-12 text-end">
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                <button type="button" class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+            </div>
+        </form>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Distance (km)</th>
+                            <th>Cost (₹)</th>
+                            <th>Time (mins)</th>
+                            <th>Departure</th>
+                            <th>Flight Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in flights %}
+                            <tr>
+                                <td>{{ f.from }}</td>
+                                <td>{{ f.to }}</td>
+                                <td>{{ f.distance }}</td>
+                                <td>{{ f.cost }}</td>
+                                <td>{{ f.time }}</td>
+                                <td>{{ f.departure }}</td>
+                                <td>{{ f.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+    </div>
+</body>
+</html>
