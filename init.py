@@ -8,15 +8,15 @@ API_KEY = "your-api-key"
 BASE_URL = "http://api.aviationstack.com/v1/flights"
 
 popular_airports = [
-    "DEL", 
-    "BOM", 
-    "BLR",  
-    "HYD", 
-    "CCU", 
+    "DEL",
+    "BOM",
+    "BLR",
+    "HYD",
+    "CCU",
     "MAA",
-    "AMD",  
-    "GOI",  
-    "PNQ", 
+    "AMD",
+    "GOI",
+    "PNQ",
 ]
 
 iata_to_city = {
@@ -31,6 +31,7 @@ iata_to_city = {
     "PNQ": "Pune(PNQ)",
 }
 
+
 def get_distance(from_iata, to_iata):
     dummy_distances = {
         ("DEL", "BOM"): 1150,
@@ -44,6 +45,7 @@ def get_distance(from_iata, to_iata):
     }
     return dummy_distances.get((from_iata, to_iata), 1000)
 
+
 def fetch_flights(from_iata, to_iata):
     params = {
         "access_key": API_KEY,
@@ -56,7 +58,7 @@ def fetch_flights(from_iata, to_iata):
         res = requests.get(BASE_URL, params=params)
         data = res.json()
         flights_data = data.get("data", [])
-        
+
         flights = []
 
         for f in flights_data:
@@ -93,12 +95,13 @@ def fetch_flights(from_iata, to_iata):
     except Exception as e:
         return []
 
+
 def build_flight_file():
     filename = "flight.txt"
     seen = set()
 
     with open(filename, "w") as f:
-        for i in range(len(popular_airports)): 
+        for i in range(len(popular_airports)):
             for j in range(len(popular_airports)):
                 if i == j:
                     continue
@@ -114,6 +117,9 @@ def build_flight_file():
                 for flight in flights:
                     f.write(flight + "\n")
                 time.sleep(1.2)
+
+    print(" All flights saved to flight.txt")
+
 
 if __name__ == "__main__":
     build_flight_file()
