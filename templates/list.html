@@ -128,6 +128,7 @@
                 <table class="table table-bordered table-hover table-striped align-middle">
                     <thead>
                         <tr>
+                            <th>Flight Code</th>
                             <th>From</th>
                             <th>To</th>
                             <th>Distance (km)</th>
@@ -140,6 +141,7 @@
                     <tbody>
                         {% for f in flights %}
                             <tr>
+                                <td>{{ f.code }}</td>
                                 <td>{{ f.from }}</td>
                                 <td>{{ f.to }}</td>
                                 <td>{{ f.distance }}</td>
@@ -156,5 +158,36 @@
 
         <a href="/" class="btn btn-secondary">Back to Home</a>
     </div>
+    <script>
+    function applyFilters() {
+    const from = document.getElementById('filterFrom').value.toLowerCase();
+    const to = document.getElementById('filterTo').value.toLowerCase();
+    const minPrice = parseInt(document.getElementById('filterMinPrice').value) || 0;
+    const maxPrice = parseInt(document.getElementById('filterMaxPrice').value) || Infinity;
+    const depAfter = document.getElementById('filterDepartureStart').value;
+    const depBefore = document.getElementById('filterDepartureEnd').value;
+
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+        const fromVal = row.children[1].textContent.toLowerCase().trim(); 
+        const toVal = row.children[2].textContent.toLowerCase().trim();
+        const price = parseInt(row.children[4].textContent.trim());
+        const departure = row.children[6].textContent.trim();
+
+        const matchFrom = !from || fromVal.includes(from);
+        const matchTo = !to || toVal.includes(to);
+        const matchPrice = !isNaN(price) && price >= minPrice && price <= maxPrice;
+        const matchDepAfter = !depAfter || departure >= depAfter;
+        const matchDepBefore = !depBefore || departure <= depBefore;
+
+        if (matchFrom && matchTo && matchPrice && matchDepAfter && matchDepBefore) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
 </body>
 </html>
