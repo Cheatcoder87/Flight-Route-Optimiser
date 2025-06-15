@@ -31,7 +31,7 @@ def status():
 
         url = f"https://aerodatabox.p.rapidapi.com/flights/number/{flight_code}/{flight_date}"
         headers = {
-            "X-RapidAPI-Key": "your-api-key",
+            "X-RapidAPI-Key": "840ac6a037msha8c99f328ba2d69p1a12a1jsnc90162f8b692",
             "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com"
         }
 
@@ -175,13 +175,16 @@ def parse_output(output):
                 current_option = []
             i += 1
 
-        elif "->" in line and (i + 1 < len(lines) and lines[i + 1].startswith("Flight:")):
+        elif "->" in line and (i + 1 < len(lines) and lines[i + 1].startswith("Flight Code:")):
             route = line.strip()
+            i += 1
+            flight_code = lines[i].replace("Flight Code:", "").strip()
             i += 1
             flight_name = lines[i].replace("Flight:", "").strip()
             i += 1
 
             flight = {
+                'code': flight_code,
                 'name': flight_name,
                 'route': route,
                 'departure': '',
@@ -236,7 +239,7 @@ def parse_list_output(output):
             continue 
 
         parts = line.strip().split()
-        if len(parts) < 7:
+        if len(parts) < 8:
             continue
 
         from_airport = parts[0]
@@ -245,7 +248,8 @@ def parse_list_output(output):
         cost = parts[3]
         duration = parts[4]
         departure = parts[5]
-        name = ' '.join(parts[6:])
+        name = parts[6].replace('_',' ')
+        code = parts[7]
 
         flights.append({
             'from': from_airport,
@@ -254,7 +258,8 @@ def parse_list_output(output):
             'cost': cost,
             'time': duration,
             'departure': departure,
-            'name': name
+            'name': name,
+            'code': code,
         })
 
     return flights
