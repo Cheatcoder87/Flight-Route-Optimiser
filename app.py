@@ -31,7 +31,7 @@ def status():
 
         url = f"https://aerodatabox.p.rapidapi.com/flights/number/{flight_code}/{flight_date}"
         headers = {
-            "X-RapidAPI-Key": "840ac6a037msha8c99f328ba2d69p1a12a1jsnc90162f8b692",
+            "X-RapidAPI-Key": "your-api-key",
             "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com"
         }
 
