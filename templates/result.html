@@ -68,6 +68,7 @@
                         {% for f in option.flights %}
                             <div class="border-bottom pb-2 mb-3">
                                 <h5 class="card-title">{{ f.name }}</h5>
+                                <p class="card-text mb-1"><strong>Flight Code:</strong> {{ f.code }}</p>
                                 <p class="card-text mb-1"><strong>Route:</strong> {{ f.route }}</p>
                                 <p class="card-text mb-1"><strong>Departure:</strong> {{ f.departure }}</p>
                                 <p class="card-text mb-1"><strong>Duration:</strong> {{ f.duration }} min</p>
