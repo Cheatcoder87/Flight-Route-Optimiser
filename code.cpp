@@ -8,13 +8,15 @@ struct flight{
     int cost;
     string departure;
     string name;
-    flight(int to_,int d,int c,int t,string dept,string n){
+    string code;
+    flight(int to_,int d,int c,int t,string dept,string n,string c1){
         to=to_;
         distance=d;
         time=t;
         cost=c;
         departure=dept;
         name=n;
+        code=c1;
     }
 };
 
@@ -46,13 +48,13 @@ public:
         adj.emplace_back();
     }
 
-    void addflight(string from,string to,int d,int c,int t,string dept,string n) {
+    void addflight(string from,string to,int d,int c,int t,string dept,string n,string c1) {
         addairport(from);
         addairport(to);
         int ind=indextoflight.size();
         flightindex[n]=ind;
-        indextoflight.push_back(flight(airportindex[to],d,c,t,dept,n));
-        adj[airportindex[from]].push_back(flight(airportindex[to],d,c,t,dept,n));
+        indextoflight.push_back(flight(airportindex[to],d,c,t,dept,n,c1));
+        adj[airportindex[from]].push_back(flight(airportindex[to],d,c,t,dept,n,c1));
     }
 
     int time(string x, string y) {
@@ -193,9 +195,10 @@ public:
 
                 adj[spur_node] = backup;
 
-                if(spur.total_cost == 1e9) continue;
+                if(spur.total_cost == 1e9 || spur.nodes.empty() || spur.nodes[0] != spur_node) continue;
                 Path total;
                 total.nodes.insert(total.nodes.end(), A[k-1].nodes.begin(), A[k-1].nodes.begin()+i);
+                total.flights_taken.insert(total.flights_taken.end(), A[k-1].flights_taken.begin(), A[k-1].flights_taken.begin()+i);
                 total.nodes.insert(total.nodes.end(), spur.nodes.begin(), spur.nodes.end());
                 total.flights_taken.insert(total.flights_taken.end(), spur.flights_taken.begin(), spur.flights_taken.end());
 
@@ -222,6 +225,12 @@ public:
             if(B.empty()) break;
             A.push_back(B.top()); B.pop();
         }
+        for (Path &p : A) {
+            p.total_cost = 0; 
+            for (int i : p.flights_taken) {
+                p.total_cost += indextoflight[i].cost;
+            }
+        }
         if(b>=c){
             sort(A.begin(), A.end(), [](const Path &a, const Path &b) {
                 if(a.total_cost == b.total_cost) return a.total_time < b.total_time;
@@ -244,21 +253,15 @@ public:
                     cout<<endl;
                 }
                 flight &f = indextoflight[A[i].flights_taken[j]];
-                string x=indextoairport[A[i].nodes[j]];
-                string x1="";
-                bool flag=false;
-                for(int i=0; i<x.size()-1; i++){
-                    if(flag) x1+=x[i];
-                    if(x[i]=='(') flag=true;
-                }
-                string y=indextoairport[f.to];
-                string y1="";
-                flag=false;
-                for(int i=0; i<y.size()-1; i++){
-                    if(flag) y1+=y[i];
-                    if(y[i]=='(') flag=true;
-                }
-                cout<<x1<<" "<<"->"<<" "<<y1<<endl;
+                string x = indextoairport[A[i].nodes[j]];
+                string y = indextoairport[f.to];
+                auto extract_code = [](const string& airport) {
+                    size_t start = airport.find('('), end = airport.find(')');
+                    if (start != string::npos && end != string::npos && end > start) return airport.substr(start + 1, end - start - 1);
+                    return airport;
+                };
+                cout<<extract_code(x)<<" "<<"->"<<" "<<extract_code(y)<<endl;
+                cout<<"Flight Code: "<<f.code<<endl;
                 cout<< "Flight: " << f.name << endl;
                 cout<<"Departure: " << f.departure <<endl;
                 cout<<"Duration: " << f.time <<" min "<<endl;
@@ -289,11 +292,11 @@ int main(int argc, char* argv[]) {
         cout<<"Error opening file"<<endl;
         return 1;
     }
-    string from,to,name,dept;
+    string from,to,name,dept,code;
     int d,c,time;
-    while(fin>>from>>to>>time>>c>>d>>dept>>name){
+    while(fin>>from>>to>>time>>c>>d>>dept>>name>>code){
         replace(name.begin(),name.end(),'_',' ');
-        fg.addflight(from, to, d, c,time, dept,name);
+        fg.addflight(from, to, d, c,time, dept,name,code);
     }
     fin.close();
 
@@ -325,11 +328,10 @@ int main(int argc, char* argv[]) {
             cout<<"Error opening file"<<endl;
             return 1;
         }
-        string from,to,name,dept;
+        string from,to,name,dept,code;
         int d,c,time;
-        while(fin>>from>>to>>time>>c>>d>>dept>>name){
-            replace(name.begin(),name.end(),'_',' ');
-            cout<<from<<" "<<to<<" "<<d<<" "<<c<<"  "<<time<<" "<<dept<<" "<<name<<endl;
+        while(fin>>from>>to>>time>>c>>d>>dept>>name>>code){
+            cout<<from<<" "<<to<<" "<<d<<" "<<c<<"  "<<time<<" "<<dept<<" "<<name<<" "<<code<<endl;
         }
     }
     return 0;
