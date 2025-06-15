@@ -1,22 +1,13 @@
 import requests
-from datetime import datetime, timezone
+from datetime import datetime
 import time
 import re
 
 API_KEY = "your-api-key"
-
 BASE_URL = "http://api.aviationstack.com/v1/flights"
 
 popular_airports = [
-    "DEL",
-    "BOM",
-    "BLR",
-    "HYD",
-    "CCU",
-    "MAA",
-    "AMD",
-    "GOI",
-    "PNQ",
+    "DEL", "BOM", "BLR", "HYD", "CCU", "MAA", "AMD", "GOI", "PNQ",
 ]
 
 iata_to_city = {
@@ -31,7 +22,6 @@ iata_to_city = {
     "PNQ": "Pune(PNQ)",
 }
 
-
 def get_distance(from_iata, to_iata):
     dummy_distances = {
         ("DEL", "BOM"): 1150,
@@ -44,7 +34,6 @@ def get_distance(from_iata, to_iata):
         ("BLR", "CCU"): 1550,
     }
     return dummy_distances.get((from_iata, to_iata), 1000)
-
 
 def fetch_flights(from_iata, to_iata):
     params = {
@@ -77,24 +66,31 @@ def fetch_flights(from_iata, to_iata):
             distance = get_distance(from_iata, to_iata)
             cost = distance * 6
 
-            raw_airline = f.get("airline", {}).get("name", "UnknownAirline")
-            raw_number = f.get("flight", {}).get("number", "UNK000")
+            airline = f.get("airline", {}).get("name", "UnknownAirline")
+            flight_number = f.get("flight", {}).get("number", "UNK000")
+            flight_iata = f.get("flight", {}).get("iata", "UNK-IATA")
 
-            clean_airline = re.sub(r'[^a-zA-Z0-9]', '', raw_airline)
-            clean_number = re.sub(r'[^a-zA-Z0-9]', '', raw_number)
+            clean_airline = re.sub(r'[^a-zA-Z0-9]', '', airline)
+            clean_number = re.sub(r'[^a-zA-Z0-9]', '', flight_number)
+            clean_flight_iata = re.sub(r'[^a-zA-Z0-9]', '', flight_iata)
+
             airline_code = f"{clean_airline}_{clean_number}"
 
             from_city = iata_to_city.get(from_iata, from_iata)
             to_city = iata_to_city.get(to_iata, to_iata)
 
-            flight_str = f"{from_city} {to_city} {travel_minutes} {cost} {distance} {dep_dt.strftime('%H:%M')} {airline_code}"
+            flight_str = (
+                f"{from_city} {to_city} {travel_minutes} {cost} {distance} "
+                f"{dep_dt.strftime('%H:%M')} {airline_code} {clean_flight_iata}"
+            )
+
             flights.append(flight_str)
 
         return flights
 
     except Exception as e:
+        print(f"Error fetching flights from {from_iata} to {to_iata}: {e}")
         return []
-
 
 def build_flight_file():
     filename = "flight.txt"
@@ -112,14 +108,13 @@ def build_flight_file():
                 if key in seen:
                     continue
                 seen.add(key)
+
                 flights = fetch_flights(from_iata, to_iata)
 
                 for flight in flights:
                     f.write(flight + "\n")
+
                 time.sleep(1.2)
-
-    print(" All flights saved to flight.txt")
-
 
 if __name__ == "__main__":
     build_flight_file()
